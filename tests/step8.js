@@ -1,8 +1,30 @@
+/*
+  In Step 8, you will add a total duration for an album.
+
+  If you look at the listing for an album, you'll see that each song
+  has a duration in seconds. We'd like to automatically compute the
+  duration of an album by summing the duration of each of its songs.
+
+  You'll do this using a computed property on the AlbumController.
+
+  The first step is to define the AlbumController. Because it
+  represents a single album, create a subclass of Ember.ObjectController.
+
+  To make sure that the computed property updates appropriately,
+  you'll need to define its dependent key. Make sure you understand the
+  @each dependent key.
+*/
+
 step(8, "Total Duration");
 
 function makeSong(options) {
   return Ember.Object.create(options);
 }
+
+test("The AlbumController is defined", function() {
+  ok(App.AlbumController, "The AlbumController is defined");
+  ok(Ember.ObjectController.detect(App.AlbumController), "The AlbumController is a subclass of Ember.ObjectController");
+});
 
 test("The AlbumController correctly calculates totalDuration", function() {
   var controller = createController('album');
