@@ -12,6 +12,12 @@ App.Router.map(function() {
   this.resource('album', { path: '/album/:album_id' });
 });
 
+App.IndexRoute = Ember.Route.extend({
+  model: function() {
+    return App.Album.find();
+  }
+});
+
 App.AlbumController = Ember.ObjectController.extend({
   needs: ['nowPlaying'],
   totalDuration: function() {
@@ -39,10 +45,9 @@ Ember.Handlebars.registerBoundHelper('format-duration', function(seconds) {
   return formattedMinutes + ":" + formattedSeconds;
 });
 
-App.IndexRoute = Ember.Route.extend({
-  model: function() {
-    return App.Album.find();
-  }
+App.AudioView = Ember.View.extend({
+  templateName: 'audioControl',
+  classNames: ['audio-control']
 });
 
 })();
