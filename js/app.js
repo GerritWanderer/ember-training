@@ -66,6 +66,16 @@ App.AudioView = Ember.View.extend({
     this.$('audio').on('play', function() {
       view.set('isPlaying', true);
     });
+  },
+
+  playSong: function() {
+    this.set('isPlaying', true);
+    this.$('audio')[0].play();
+  },
+
+  pauseSong: function() {
+    this.set('isPlaying', false);
+    this.$('audio')[0].pause();
   }
 });
 

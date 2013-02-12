@@ -91,6 +91,11 @@
 
     <script type="text/x-handlebars" data-template-name="audioControl">
       <audio {{bindAttr src="view.src"}} autoplay></audio>
+      {{#if view.isPlaying}}
+        <button {{action "pauseSong" target="view"}} class="pause">❙❙</button>
+      {{else}}
+        <button class="play" {{action "playSong" target="view"}}>▶</button>
+      {{/if}}
     </script>
 
     <div id="qunit" style="display: none"></div>
