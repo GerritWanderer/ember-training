@@ -12,6 +12,12 @@ App.Router.map(function() {
   this.resource('album', { path: '/album/:album_id' });
 });
 
+App.ApplicationRoute = Ember.Route.extend({
+  setupController: function() {
+    this.controllerFor('nowPlaying');
+  }
+});
+
 App.IndexRoute = Ember.Route.extend({
   model: function() {
     return App.Album.find();
@@ -31,12 +37,20 @@ App.AlbumController = Ember.ObjectController.extend({
     return total;
   }.property('songs.@each.duration'),
 
-  play: function(song) {
-    this.set('controllers.nowPlaying.model', song);
+  play: function(controller) {
+    this.set('controllers.nowPlaying.model', controller.get('model'));
   }
 });
 
 App.NowPlayingController = Ember.ObjectController.extend();
+
+App.SongController = Ember.ObjectController.extend({
+  needs: 'nowPlaying',
+
+  isPlaying: function() {
+    return this.get('controllers.nowPlaying.model') === this.get('model');
+  }.property('controllers.nowPlaying.model')
+});
 
 Ember.Handlebars.registerBoundHelper('format-duration', function(seconds) {
   var formattedMinutes = Math.floor(seconds / 60);
