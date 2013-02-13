@@ -54,8 +54,8 @@
         <h2>{{artist}}</h2>
       </div>
       <table class="album-listing">
-        {{#each songs}}
-          <tr>
+        {{#each songs itemController="song"}}
+          <tr {{bindAttr class="isPlaying"}}>
             <td class="song-track">
               <span class="track-number">{{track}}</span>
               <span class="play" {{action "play" this}}>▶</span>
@@ -73,14 +73,14 @@
     <script type="text/x-handlebars" data-template-name="nowPlaying">
       <footer class="now-playing">
         {{#if model}}
-          <img class="now-playing-artwork" {{bindAttr src="artwork"}}>
+          <img class="now-playing-artwork" {{bindAttr src="album.artwork"}}>
           <div class="now-playing-body">
             <p class="now-playing-details">
               <span class="now-playing-name">{{name}}</span> -
               <span class="now-playing-artist">{{album.artist}}</span>
             </p>
             <div class="now-playing-player">
-              {{view App.AudioView}}
+              {{view App.AudioView srcBinding="url"}}
             </div>
           </div>
         {{else}}
