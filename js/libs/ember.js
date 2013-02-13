@@ -150,8 +150,8 @@ Ember.deprecateFunc = function(message, func) {
 
 })();
 
-// Version: v1.0.0-pre.4-197-g3df5ddf
-// Last commit: 3df5ddf (2013-02-10 13:39:21 -0800)
+// Version: v1.0.0-pre.4-205-g9758b1e
+// Last commit: 9758b1e (2013-02-12 13:07:15 -0800)
 
 
 (function() {
@@ -19785,6 +19785,8 @@ Ember.Handlebars.EachView = Ember.CollectionView.extend(Ember._Metamorph, {
       set(controller, 'itemController', itemController);
       set(controller, 'container', get(this, 'controller.container'));
       set(controller, '_eachView', this);
+      set(controller, 'target', get(this, 'controller'));
+
       this.disableContentObservers(function() {
         set(this, 'content', controller);
         binding = new Ember.Binding('content', '_eachView.dataSource').oneWay();
@@ -22710,7 +22712,7 @@ Ember.Router = Ember.Object.extend({
   didTransition: function(infos) {
     // Don't do any further action here if we redirected
     for (var i=0, l=infos.length; i<l; i++) {
-      if (infos[i].handler.transitioned) { return; }
+      if (infos[i].handler.redirected) { return; }
     }
 
     var appController = this.container.lookup('controller:application'),
@@ -22944,7 +22946,7 @@ Ember.Route = Ember.Object.extend({
     @param {...Object} models the
   */
   transitionTo: function() {
-    this.transitioned = true;
+    if (this._checkingRedirect) { this.redirected = true; }
     return this.router.transitionTo.apply(this.router, arguments);
   },
 
@@ -22957,7 +22959,7 @@ Ember.Route = Ember.Object.extend({
     @param {...Object} models the
   */
   replaceWith: function() {
-    this.transitioned = true;
+    if (this._checkingRedirect) { this.redirected = true; }
     return this.router.replaceWith.apply(this.router, arguments);
   },
 
@@ -22973,10 +22975,13 @@ Ember.Route = Ember.Object.extend({
     @method setup
   */
   setup: function(context) {
-    this.transitioned = false;
+    this.redirected = false;
+    this._checkingRedirect = true;
+
     this.redirect(context);
 
-    if (this.transitioned) { return false; }
+    this._checkingRedirect = false;
+    if (this.redirected) { return false; }
 
     var controller = this.controllerFor(this.routeName, context);
 
@@ -26663,8 +26668,8 @@ Ember States
 
 
 })();
-// Version: v1.0.0-pre.4-197-g3df5ddf
-// Last commit: 3df5ddf (2013-02-10 13:39:21 -0800)
+// Version: v1.0.0-pre.4-205-g9758b1e
+// Last commit: 9758b1e (2013-02-12 13:07:15 -0800)
 
 
 (function() {

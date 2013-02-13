@@ -232,6 +232,10 @@ function waitFor(object, property, callback) {
   }, 3800);
 }
 
+function controllerFor(controller) {
+  return App.__container__.lookup('controller:' + controller);
+}
+
 function removeExpectedFromResult() {
   // I cried the tears of my liiiiife
   var assertions = QUnit.config.current.assertions,

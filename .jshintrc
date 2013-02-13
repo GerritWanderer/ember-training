@@ -20,6 +20,7 @@
         "urlEquals",
         "click",
         "navigateTo",
+        "controllerFor",
         "waitFor",
         "propertyShouldBecome",
         "shouldHaveTemplate",
