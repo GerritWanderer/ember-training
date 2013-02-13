@@ -39,10 +39,33 @@
               {{view App.AudioView srcBinding=url}}
             </div>
           </div>
+          <button {{action "showQueue"}}>{{nextSongs.length}} songs in queue</button>
         {{else}}
           <span class="now-playing-empty">Select a song to start playing.</span>
         {{/if}}
       </footer>
+
+      {{#if showingQueue}}
+        <div style="position: absolute; top: 100px; right: 100px; left: 100px; bottom: 100px; border: 1px solid gray; background: white">
+
+          <table class="album-listing">
+            <tbody>
+              {{#each song in nextSongs itemController="song"}}
+                <tr {{bindAttr class="isCurrentlyPlaying:playing"}}>
+                  <td class="song-track">
+                    <span class="track-number">{{song.track}}</span>
+                    <span class="play" {{action "togglePlay"}}>▶</span><!-- FIXME: action context still changes? -->
+                    <span class="pause" {{action "togglePlay"}}>❙❙</span>
+                  </td>
+                  <td class="song-name">{{song.name}}</td>
+                  <td class="song-duration">{{format-duration song.duration}}</td>
+                  <td><button {{action "addToQueue"}}>Queue</button></td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      {{/if}}
     </script>
 
     <script type="text/x-handlebars" data-template-name="index">
@@ -72,19 +95,24 @@
         <h2>{{artist}}</h2>
       </div>
       <table class="album-listing">
-        {{#each song in songs}}
-          <tr>
+        <tbody>
+        {{#each song in songs itemController="song"}}
+          <tr {{bindAttr class="isCurrentlyPlaying:playing"}}>
             <td class="song-track">
               <span class="track-number">{{song.track}}</span>
-              <span class="play" {{action "play" song}}>▶</span>
+              <span class="play" {{action "togglePlay"}}>▶</span><!-- FIXME: action context still changes? -->
+              <span class="pause" {{action "togglePlay"}}>❙❙</span>
             </td>
             <td class="song-name">{{song.name}}</td>
             <td class="song-duration">{{format-duration song.duration}}</td>
+            <td><button {{action "addToQueue"}}>Queue</button></td>
+            <td><div draggable="true">HERP</div></td>
           </tr>
         {{/each}}
         <tr>
           <td class="total-duration" colspan="3">Total Time: {{format-duration totalDuration}}</td>
         </tr>
+        </tbody>
       </table>
     </script>
 
@@ -95,10 +123,13 @@
         {{else}}
         <button class='play' {{action "playSong" target=view}}>▶</button>
       {{/if}}
+      <button {{action "playNextSong" target=controller}}>&raquo;</button>
 
       {{#if view.isLoaded}}
         <input type="range" min="0" {{bindAttr max="view.duration" value="view.currentTime"}}>
-        <p class='duration'>{{format-duration view.currentTime}}</p>
+        <p class='duration' {{action "toggleTimeDisplay" target=view}}>
+          {{format-duration view.displayTime}}
+        </p>
       {{else}}
         <p class='loading'>Loading...</p>
       {{/if}}

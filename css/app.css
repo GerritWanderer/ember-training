@@ -111,6 +111,10 @@ header h1 {
   border-bottom: 1px solid #e1e6e9;
 }
 
+.album-listing tr.playing {
+  background: #dcdcdc;
+}
+
 .album-listing td {
   font-size: 12px;
   width: 1px;
@@ -136,16 +140,26 @@ header h1 {
   display: none;
 }
 
-.album-listing tr:hover td.song-track .play {
+.album-listing tr td.song-track .pause {
+  display: none;
+}
+
+
+.album-listing tr:hover:not(.playing) td.song-track .play,
+.album-listing tr.playing td.song-track .pause {
   display: block;
   cursor: pointer;
+}
+
+.album-listing tr.playing td.song-track .pause {
 }
 
 .album-listing tr td.song-track .track-number {
   display: block;
 }
 
-.album-listing tr:hover td.song-track .track-number {
+.album-listing tr:hover td.song-track .track-number,
+.album-listing tr.playing td.song-track .track-number {
   display: none;
 }
 
@@ -220,4 +234,11 @@ div.audio-control input[type=range] {
   -webkit-flex-grow: 1;
   position: relative;
   top: 1px;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }

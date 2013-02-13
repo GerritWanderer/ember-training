@@ -8,6 +8,22 @@ App.Router.map(function() {
   this.resource("album", { path: "/album/:album_id" });
 });
 
+App.ApplicationRoute = Ember.Route.extend({
+  setupController: function() {
+    var noop = this.controllerFor('nowPlaying'); // noop to workaround `render` bug
+  },
+
+  events: {
+    playNextSong: function() {
+      this.controllerFor('nowPlaying').playNextSong();
+    },
+
+    showQueue: function() {
+      this.controllerFor('nowPlaying').toggleProperty('showingQueue');
+    }
+  }
+});
+
 App.IndexRoute = Ember.Route.extend({
   model: function() {
     return App.Album.find();
@@ -24,20 +40,52 @@ App.AlbumController = Ember.ObjectController.extend({
     });
 
     return total;
-  }.property('songs.@each.duration'),
+  }.property('songs.@each.duration')
+});
 
-  play: function(song) {
-    this.set('controllers.nowPlaying.content', song);
+App.NowPlayingController = Ember.ObjectController.extend({
+  nextSongs: null,
+  showingQueue: false,
+  isPlaying: false,
+
+  init: function() {
+    this.set('nextSongs', []);
+    this._super();
+  },
+
+  playNextSong: function() {
+    var nextSong = this.get('nextSongs').shiftObject();
+    this.set('content', nextSong);
   }
 });
 
-App.NowPlayingController = Ember.ObjectController.extend();
+App.SongController = Ember.ObjectController.extend({
+  needs: ['nowPlaying'],
+
+  isPlaying: null,
+  isPlayingBinding: "controllers.nowPlaying.isPlaying",
+
+  isCurrentlyPlaying: function() {
+    return this.get('controllers.nowPlaying.content') === this.get('content');
+  }.property('controllers.nowPlaying.content', 'content'),
+
+  togglePlay: function() {
+    if (!this.get('isCurrentlyPlaying')) {
+      this.set('controllers.nowPlaying.content', this.get('content'));
+    }
+    this.toggleProperty('isPlaying');
+  },
+
+  addToQueue: function() {
+    this.get('controllers.nowPlaying.nextSongs').pushObject(this.get('content'));
+  }
+});
 
 Ember.Handlebars.registerBoundHelper('format-duration', function(seconds) {
-  var formattedMinutes = Math.floor(seconds / 60);
-  var formattedSeconds = seconds % 60;
+  var formattedMinutes = Math.floor(Math.abs(seconds / 60));
+  var formattedSeconds = Math.abs(seconds % 60);
   formattedSeconds = formattedSeconds < 10 ? "0" + formattedSeconds : formattedSeconds;
-  return formattedMinutes + ":" + formattedSeconds;
+  return (seconds < 0 ? '-' : '') + formattedMinutes + ":" + formattedSeconds;
 });
 
 var attr = DS.attr, hasMany = DS.hasMany, belongsTo = DS.belongsTo;
@@ -126,7 +174,19 @@ App.AudioView = Ember.View.extend({
   templateName: 'audio-control',
   classNames: 'audio-control',
   currentTime: 0,
-  isPlaying: true,
+  isPlayingBinding: "controller.isPlaying",
+  isReversed: false,
+
+  displayTime: function() {
+    var secs;
+
+    if (this.get('isReversed')) {
+      secs = -this.get('controller.duration') + this.get('currentTime') 
+    } else {
+      secs = this.get('currentTime');
+    }
+    return secs;
+  }.property('currentTime', 'controller.duration', 'isReversed'),
 
   didInsertElement: function() {
     var view = this;
@@ -143,10 +203,19 @@ App.AudioView = Ember.View.extend({
     this.$('audio').on('play', function() {
       view.set('isPlaying', true);
     });
+
+    this.$('audio').on('ended', function() {
+      view.ended();
+    });
   },
 
   change: function() {
     this.$('audio').prop('currentTime', this.$('input').val());
+  },
+
+  ended: function() {
+    this.set('isPlaying', false);
+    this.get('controller').send('playNextSong');
   },
 
   playSong: function() {
@@ -157,5 +226,17 @@ App.AudioView = Ember.View.extend({
   pauseSong: function() {
     this.set('isPlaying', false);
     this.$('audio')[0].pause();
-  }
+  },
+
+  toggleTimeDisplay: function() {
+    this.toggleProperty('isReversed');
+  },
+
+  isPlayingDidChange: function() {
+    if (this.get('isPlaying')) {
+      this.$('audio')[0].play();
+    } else {
+      this.$('audio')[0].pause();
+    }
+  }.observes('isPlaying')
 });
