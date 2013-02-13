@@ -15,6 +15,16 @@ App.Router.map(function() {
 App.ApplicationRoute = Ember.Route.extend({
   setupController: function() {
     this.controllerFor('nowPlaying');
+  },
+
+  events: {
+    addToQueue: function(song) {
+      this.controllerFor('nowPlaying').addToQueue(song);
+    },
+
+    play: function(song) {
+      this.controllerFor('nowPlaying').set('model', song);
+    }
   }
 });
 
@@ -35,14 +45,22 @@ App.AlbumController = Ember.ObjectController.extend({
     });
 
     return total;
-  }.property('songs.@each.duration'),
-
-  play: function(controller) {
-    this.set('controllers.nowPlaying.model', controller.get('model'));
-  }
+  }.property('songs.@each.duration')
 });
 
-App.NowPlayingController = Ember.ObjectController.extend();
+App.NowPlayingController = Ember.ObjectController.extend({
+  nextSongs: null,
+  showingQueue: false,
+
+  addToQueue: function(song) {
+    if (!this.get('nextSongs')) { this.set('nextSongs', []); }
+    this.get('nextSongs').pushObject(song);
+  },
+
+  showQueue: function() {
+    this.toggleProperty('showingQueue');
+  }
+});
 
 App.SongController = Ember.ObjectController.extend({
   needs: 'nowPlaying',

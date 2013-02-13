@@ -190,6 +190,7 @@ footer.now-playing .now-playing-body {
 
 footer.now-playing .now-playing-empty {
   -webkit-align-self: center;
+  -webkit-flex-grow: 1;
 }
 
 p.now-playing-player {
@@ -224,4 +225,19 @@ div.audio-control input[type=range] {
   -webkit-flex-grow: 1;
   position: relative;
   top: 1px;
+}
+
+#queue {
+  position: absolute;
+  top: 150px;
+  right: 150px;
+  bottom: 150px;
+  left: 150px;
+  border: 1px solid #ccc;
+  background: white;
+  padding: 10px;
+}
+
+.show-queue {
+  width: 100px;
 }

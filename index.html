@@ -58,10 +58,13 @@
           <tr {{bindAttr class="isPlaying"}}>
             <td class="song-track">
               <span class="track-number">{{track}}</span>
-              <span class="play" {{action "play" this}}>▶</span>
+              <span class="play" {{action "play" model}}>▶</span>
             </td>
             <td class="song-name">{{name}}</td>
             <td class="song-duration">{{format-duration duration}}</td>
+            <td>
+              <button class="queue" {{action "addToQueue" model}}>Queue</button>
+            </td>
           </tr>
         {{/each}}
         <tr>
@@ -86,7 +89,27 @@
         {{else}}
           <span class="now-playing-empty">Select a song to start playing.</span>
         {{/if}}
+        <button class="show-queue" {{action showQueue}}>Show queue</button>
       </footer>
+
+      {{#if showingQueue}}
+        <div id="queue">
+          <table class="album-listing">
+            {{#each nextSongs}}
+              <tr>
+                <td class="song-track">
+                  <span class="play" {{action "play" this}}>▶</span>
+                </td>
+                <td class="song-name">{{name}} - {{album.artist}}</td>
+                <td class="song-duration">{{format-duration duration}}</td>
+                <td>
+                  <button class="queue" {{action "addToQueue" this}}>Queue</button>
+                </td>
+              </tr>
+            {{/each}}
+          </table>
+        </div>
+      {{/if}}
     </script>
 
     <script type="text/x-handlebars" data-template-name="audioControl">
