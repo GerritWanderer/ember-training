@@ -121,6 +121,10 @@ header h1 {
   min-width: 30px;
 }
 
+.album-listing tr.is-playing {
+  background-color: #FCFBBB;
+}
+
 .album-listing td:first-child {
   color: #89949b;
   text-align: center;
